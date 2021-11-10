@@ -1,9 +1,8 @@
 import torch
 from torch.distributions.kl import kl_divergence
 from torch.nn.utils.convert_parameters import parameters_to_vector, vector_to_parameters
-from base_learner import BaseMetaLearner, detach_distribution
-
-
+from meta_learner.base_learner import BaseMetaLearner, detach_distribution
+from functools import reduce
 class TRPOMetaLearner(BaseMetaLearner):
     """
     MetaLearner use TRPO algorithm, main structure comes from  github.com/tristandeleu/pytorch-maml-rl
@@ -69,6 +68,7 @@ class TRPOMetaLearner(BaseMetaLearner):
         num_tasks = len(train_episodes)
         surrogate_losses = [self.surrogate_loss(train_episode, test_episode)
                             for (train_episode, test_episode) in zip(train_episodes, test_episodes)]
+        # old_losses, old_kls, old_pis = reduce(lambda x, y: [x[i].append(y[i]) for i in range(3)] and x, surrogate_losses, [[],[],[]])
         old_losses = [_[0] for _ in surrogate_losses]
         old_kls = [_[1] for _ in surrogate_losses]
         old_pis = [_[2] for _ in surrogate_losses]

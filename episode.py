@@ -11,6 +11,7 @@ class Episode(object):
         self._rtg = []  # reward to go
         self.gamma = gamma
         self._advantages = []
+        self.values = []
         pass
 
     @property
