@@ -29,11 +29,12 @@ class TaskWorker(object):
 
         test_episode = self.create_episode(params)
         self.test_episodes.append(test_episode)
+        return train_episode_pairs, test_episode
 
     def create_episode(self, params, gae_lambda=1.0, gamma=0.99):
         episode = Episode(gamma)
         for observation, action, reward, log_prob in self.create_trajectories(params):
-            episode.add(observation, action, reward, log_prob)
+            episode.add(observation, action, reward, log_prob.detach())
         episode.compute_rtg()
 
         self.baseline.fit(episode)

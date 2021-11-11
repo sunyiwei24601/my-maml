@@ -1,2 +1,5 @@
 .idea/*
 ./tests/.pytest_cache
+result/*
+saved_policy/*
+*.pyc

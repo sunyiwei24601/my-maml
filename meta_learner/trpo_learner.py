@@ -90,6 +90,7 @@ class TRPOMetaLearner(BaseMetaLearner):
         step = stepdir / lagrange_multiplier
         old_params = parameters_to_vector(self.policy.parameters())
 
+        loss = old_loss
         # Line search step size, until we reduce the loss
         step_size = 1.0
         for _ in range(ls_max_steps):
@@ -104,8 +105,9 @@ class TRPOMetaLearner(BaseMetaLearner):
 
             losses = [_[0] for _ in surrogate_losses]
             kls = [_[1] for _ in surrogate_losses]
-
-            improve = (sum(losses) / num_tasks) - old_loss
+            
+            loss = sum(losses) / num_tasks
+            improve = loss - old_loss
             kl = sum(kls) / num_tasks
             if (improve.item() < 0.0) and (kl.item() < max_kl):
                 break
@@ -114,6 +116,8 @@ class TRPOMetaLearner(BaseMetaLearner):
             step_size *= ls_backtrack_ratio
         else:
             vector_to_parameters(old_params, self.policy.parameters())
+        
+        return loss
 
 
 def conjugate_gradient(f_Ax, b, cg_iters=10, residual_tol=1e-10):

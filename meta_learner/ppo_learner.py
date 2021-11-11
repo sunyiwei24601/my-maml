@@ -11,7 +11,7 @@ class PPOMetaLearner(BaseMetaLearner):
 
     def adapt(self, train_episodes, first_order=None):
         """
-            update train episodes's params, return updated params
+            update train episodes' params, return updated params
         """
         if first_order is None:
             first_order = self.first_order
@@ -50,7 +50,7 @@ class PPOMetaLearner(BaseMetaLearner):
 
         old_loss = sum(old_losses) / num_tasks
         optimizer = torch.optim.Adam(self.policy.parameters(), lr=policy_learning_rate)
-
+        loss = old_loss
         for i in range(policy_iters):
             surrogate_losses = [self.surrogate_loss(train_episode, test_episode, epsilon, old_pi)
                                 for (train_episode, test_episode, old_pi) in zip(train_episodes, test_episodes, old_pis)
@@ -61,3 +61,5 @@ class PPOMetaLearner(BaseMetaLearner):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            
+        return loss
